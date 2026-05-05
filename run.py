@@ -27,7 +27,7 @@ def plan_pick_cube():
     solution = _solve_ik_jax_batched(
         robot=robot,
         target_link_index=robot.links.names.index(target_link_name),
-        target_wxyz=jnp.array([[0, 0, 1, 0]]),
+        target_wxyz=jnp.array([[1, 0, 0, 0]]),
         target_position=jnp.array([[0, 0, 0]]), 
     )
     return np.array(solution).flatten()
@@ -39,20 +39,19 @@ env = gym.make(
     render_mode="human"
 )
 
-obs, info = env.reset()  # fix: unpack both return values
+obs, info = env.reset()  
 
 solution = plan_pick_cube()
 print("Action shape:", solution.shape)
-print("Expected action space:", env.action_space)  # check these match!
+print("Expected action space:", env.action_space)  
 
 terminated = False
 truncated = False
 
 while True:
-    action = solution  # still static — see note below
-    for step_size in range(10):
-        obs, reward, terminated, truncated, info = env.step(None)
-        env.render()
+    action = solution 
+    obs, reward, terminated, truncated, info = env.step(action)
+    env.render()
     '''
     env.step(open_gripper_action(obs['agent']['qpos']))
     env.render()
